@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Datos URLs TOR</title>
+
+</head>
+<body>
+	<style type="text/css">
+	/**
+	Primary: #581845
+	P Light: #874470
+	P Dark: #2d001e
+
+	Secondary: #c70039
+	S — Light: #ff4f63
+	S — Dark: #8e0014
+	*/
+	body{
+		font-family: sans-serif;
+		background-color: #E1E2E1;
+		color: #3f3844;
+		margin: 0;
+		padding: 0;
+	}
+	h2{
+		color: #c60038;
+		margin-bottom: 0;
+		text-align: left;
+	}
+	hr {
+    border-color: #c60038;
+    border-width: 1px;
+    border-style: none none solid;
+	}
+	.pcolor{
+		color: #581845 !important;
+	}
+	.scolor{
+		color: #c70039 !important;
+	}
+	.title{
+		text-align: left;
+		color: #c60038;
+	}
+	.title *{
+		display: inline-block;
+	}
+	.dataOptions{
+		text-align: center;
+		padding: : 16px;
+		border-bottom: solid black 1px;
+		margin-bottom: 2em;
+	}
+	.dataOptions .item{
+		padding: 8px;
+		line-height: 2em;
+		cursor: pointer;
+		color: #FFFFFF;
+		background-color: #2d001e;
+	}
+	.dataOptions .item:hover{
+		
+		background-color: #581845;
+	}
+	.dataOptions .item input{
+		display: none;
+	}
+
+	.results-container{
+		text-align: center;
+	}
+	input{
+		display: block;
+		margin: auto;
+	}
+	input[type=text]{
+		width: 90%;
+	}
+	textarea:disabled {
+	    background: white;
+	    border-style: none none solid;
+	}
+	.flex{
+		display: flex;
+		justify-content: stretch;
+	}
+	.flex .item{
+		flex: 1 1;
+	}
+	.clasi b{
+		margin-top: 1em;
+		display: block;
+	}
+	span.result{
+		display: block;
+		text-align: center;
+	}
+	.card{
+		margin: 1em;
+		margin-top: 1em;
+		padding: 1em;
+		background-color: white; 
+		border-bottom-style: solid; 
+		border-color: #c70039;
+		border-width: 3px;
+		justify-content: stretch;
+    	align-items: center;
+	}
+	.card b{
+		color: #581845;
+    	margin: 0.5em;
+	}
+	.flex.card .index{
+		flex: 2em 0 0;
+	    color: #c60038;
+	    font-weight: bolder;
+	    border-right: solid #c60038 1px;
+	    padding: 4em 4px 4em 0;
+	}
+	.card .clasification{
+		flex: 1 1;
+		/*border-style: solid; 
+		border-color: #581845;
+		border-width: 1px;
+		padding: 8px;*/
+	}
+	.card.create{
+		text-align: center;
+	}
+	.btn-add{
+		flex: 1.6em 0 1 !important;
+	    background-color: #c60038;
+	    color: white;
+	    vertical-align: middle;
+	    font-size: 1.8em;
+	    font-weight: bold;
+	    position: relative;
+	}
+	.btn-add:before {
+		content: "+";
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+	.btn-add:hover{
+		background-color: #8d0013;
+	}
+	.new-url-reslt{
+		flex:  2 1 !important;
+		padding: 1em;
+	}
+	.new-url-reslt .clasi.flex{
+		justify-content: flex-end;
+    	flex-wrap: wrap;
+	}
+	.new-url-reslt .clasi.flex .item{
+		display: flex;
+	    margin: 0.5em;
+	    flex-direction: row-reverse;
+	    align-items: baseline;
+    	justify-content: center;	    
+	}
+	.new-url-reslt .clasi.flex .item input{
+		margin: initial;
+	}
+	.error{
+		color: white;
+		background-color: #8e0014;
+		text-align: left;
+		padding: 0.5em 1em;
+	}
+
+	.color-selector{
+		flex-wrap: wrap;
+	}
+	.color-item{
+		color: white;
+		padding: 1em;
+		flex-basis: 5em;
+		text-align: center;
+	}
+
+
+	.flex.colors-show{
+		color: white;
+		font-weight: bolder;
+		text-align: center;
+	}
+	.flex.colors-show .color-item-show{
+		padding: 0.5em;
+		flex: 1 1;
+	}
+
+</style>
+
+<div class="dataOptions flex">
+	<div class="item" onclick="document.getElementById('open').click()"><b>Cargar Configuración</b> (JSON) <input type="file" id="open" onchange="openSettings()"></div>
+	<div class="item" onclick="document.getElementById('import').click()"><b>Cargar Datos</b> (CSV)<input type="file" id="import" onchange="importFile()"></div>
+	<div class="item" onclick="saveSettings()"><b>Guardar Configuración</b> (JSON)</div>
+	<div class="item" onclick="exportFile()"><b>Guardar Datos</b> (CSV)</div>
+	
+</div>
+<div id="app">
+
+	<div class="card create">
+
+		<h2>Add URL</h2>
+		<div class="error" v-if="newURLExist"><h3>¡The URL already exists!</h3></div>
+		<hr>
+		<div class="flex">
+			<div class="clasification">
+				<div class="clasi">
+					<b>URL</b>
+					<input type="text" v-model="newURL['url']" v-on:change="calculate(newURL)">
+				</div>
+				<div class="clasi">
+					<b>Title</b>
+					<input type="text" v-model="newURL['title']">
+				</div>
+				<div class="clasi">
+					<b>Category</b>
+					<input type="text" v-model="newURL['category']" list="category-list" autocomplete="off" v-on:change="verifyCategory(newURL)">
+				</div>
+			</div>
+			<div class="clasification">
+				<div class="clasi">
+					<b>Reported</b>
+					<input type="checkbox" v-bind:true-value="1" v-bind:false-value="0" v-model="newURL['reported']">
+				</div>
+				<div class="clasi">
+					<b>Illegal</b>
+					<input type="checkbox" v-bind:true-value="1" v-bind:false-value="0" v-model="newURL['illegal']">
+				</div>
+				<div class="clasi">
+					<b>Malicious</b>
+					<input type="checkbox" v-bind:true-value="1" v-bind:false-value="0" v-model="newURL['malicious']">
+				</div>
+			</div>
+
+			<div class="clasification btn-add" v-on:click="addURL">
+			</div>
+
+			<div class="clasification new-url-reslt" align="left">
+				<div class="title scolor">
+					<h3 class="">Select Values to copy</h3> <span>(Only show)</span>
+				</div>
+				<div class="clasi flex pcolor">
+					<div class="item">
+						<span>Length</span>
+						<input type="checkbox" value="length" v-model="showAttr">
+					</div>
+					<div class="item">
+						<span>Uppercase</span>
+						<input type="checkbox" value="uppercase" v-model="showAttr">
+					</div>
+					<div class="item">
+						<span>Digits</span>
+						<input type="checkbox" value="digits" v-model="showAttr">
+					</div>
+					<div class="item">
+						<span>Consonants</span>
+						<input type="checkbox" value="consonants" v-model="showAttr">
+					</div>
+					<div class="item">
+						<span>Vowels</span>
+						<input type="checkbox" value="vowels" v-model="showAttr">
+					</div>
+					<div class="item">
+						<span>Sum</span>
+						<input type="checkbox" value="sum" v-model="showAttr">
+					</div>
+					<div class="item">
+						<span>Concatenation</span>
+						<input type="checkbox" value="concat" v-model="showAttr">
+					</div>
+					</div>
+					<hr>
+					<div class="clasi">
+						<span>features = {{showAttr}}</span><br>
+						<span>values = {{showAttr.map(attr=>newURL[attr])}}</span>
+					</div>
+				</div>
+
+			
+
+		</div>
+		<hr>
+		<div class="flex">
+				<div class="item">
+						<b>Length</b>
+					<span class="result">
+						{{newURL['length']}}		
+					</span>
+					</div>
+					<div class="item">
+						<b>Uppercase</b>
+					<span class="result">
+						{{newURL['uppercase']}}
+					</span>
+					</div>
+
+
+					<div class="item">
+						<b>Digits</b>
+						<span class="result">
+							{{newURL['digits'].toFixed(2)}}
+						</span>		
+					</div>
+					<div class="item">
+						<b>Consonants</b>
+						<span class="result">
+							{{newURL['consonants'].toFixed(2)}}
+						</span>		
+					</div>
+					<div class="item">
+						<b>Vowels</b>
+						<span class="result">
+							{{newURL['vowels'].toFixed(2)}}
+						</span>
+					</div>
+
+			<div class="item">
+					<b>Sum</b>
+					<span class="result">
+							{{newURL['sum']}}
+					</span>
+				</div>
+				<div class="item">
+					<b>Concat</b>
+					<textarea disabled>{{newURL['concat']}}</textarea>
+				</div>
+		</div>
+
+
+
+
+	</div>
+	<!-- Fin Crear -->
+
+	<div class="card">
+		<h2>Categories</h2>
+		<hr>
+		<div>
+			<div class="clasi flex scolor">
+			<strong>New Category</strong>
+			<input type="text" v-model="newCategory" v-on:change="addCategory">
+			</div>
+				<p> 
+					<span v-for="cate in categories"> 
+						<b>{{cate}}</b>
+					</span>
+				</p>
+		</div>
+		<datalist id="category-list">
+			<option v-for="cate in categories" v-bind:value="cate">
+		</datalist>
+
+		<hr>
+		<h2>Colors</h2>
+		<div class="clasi flex scolor">
+			<strong>Select Color </strong>
+			<div class="flex color-selector">
+				<div v-for="(color,ind) in allColors" v-bind:id="color" class="color-item" v-bind:style="'background-color:'+color">
+					<input type="checkbox" v-bind:id="'color_'+ind" v-bind:value="color" v-model="selectedColors">
+					<label v-bind:for="'color_'+ind">{{color}}</label>
+				</div>				
+			</div>
+		</div>
+		<hr>
+		<div class="flex colors-show">
+			<div v-for="(color,ind) in selectedColors" class="color-item-show" v-bind:style="'background-color:'+color">
+				<span v-if="ind<categories.length">
+					{{categories[ind]}}	
+				</span>
+				<span v-else> - </span>
+			</div>
+		</div>
+		<br>
+		<div class="clasi">
+			<span>colors = {{selectedColors}}</span>
+		</div>
+	</div>
+
+
+	<div v-if="listURL.length>0" class="results-container">
+
+		<!--
+		<div v-for="(infoURL, ind) in listURL" class="flex">
+			{infoURL}
+		</div>
+		-->
+		<div class="card title">
+			<h2>URLs </h2> <span> ({{listURL.length}} Urls registradas)</span>
+		</div>
+		<div v-for="(infoURL, ind) in listURL" class="flex card">
+			<div class="index">
+				{{(ind+1)}}
+			</div>
+			<div class="clasification">
+				<div class="clasi">
+					<b>URL</b>
+					<input type="text" v-model="listURL[ind]['url']" v-on:change="calculate(listURL[ind])">
+				</div>
+				<div class="clasi">
+					<b>Title</b>
+					<input type="text" v-model="listURL[ind]['title']">
+				</div>
+				<div class="clasi">
+					<b>Category</b>
+					<input type="text" v-model="listURL[ind]['category']"  list="category-list" autocomplete="off" v-on:change="verifyCategory(listURL[ind])">
+				</div>
+			</div>
+			<div class="clasification">
+				<div class="clasi">
+					<b>Reported</b>
+					<input type="checkbox" v-bind:true-value="1" v-bind:false-value="0" v-model="listURL[ind]['reported']">
+				</div>
+				<div class="clasi">
+					<b>Illegal</b>
+					<input type="checkbox" v-bind:true-value="1" v-bind:false-value="0" v-model="listURL[ind]['illegal']">
+				</div>
+				<div class="clasi">
+					<b>Malicious</b>
+					<input type="checkbox" v-bind:true-value="1" v-bind:false-value="0" v-model="listURL[ind]['malicious']">
+				</div>
+			</div>
+
+			<div class="clasification">
+				<div class="clasi flex">
+					<div class="item">
+						<b>Length</b>
+					<span class="result">
+						{{listURL[ind]['length']}}		
+					</span>		
+					</div>
+					<div class="item">
+						<b>Uppercase</b>
+					<span class="result">
+						{{listURL[ind]['uppercase']}}
+					</span>
+					</div>
+				</div>
+				
+				<div class="clasi flex">
+					<div class="item">
+						<b>Digits</b>
+						<span class="result">
+							{{listURL[ind]['digits'].toFixed(2)}}
+						</span>		
+					</div>
+					<div class="item">
+						<b>Consonants</b>
+						<span class="result">
+							{{listURL[ind]['consonants'].toFixed(2)}}
+						</span>		
+					</div>
+					<div class="item">
+						<b>Vowels</b>
+						<span class="result">
+							{{listURL[ind]['vowels'].toFixed(2)}}
+						</span>
+					</div>
+				</div>
+				
+			</div>
+
+			<div class="clasification">
+				<div class="clasi">
+					<b>Sum</b>
+					<span class="result">
+							{{listURL[ind]['sum']}}
+					</span>
+				</div>
+				<div class="clasi">
+					<b>Concat</b>
+					<textarea disabled>{{listURL[ind]['concat']}}</textarea>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript" src="vue.js"></script>
+<script type="text/javascript" src="main.js"></script>
+</body>
+</html>

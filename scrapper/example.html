@@ -1,0 +1,79 @@
+<!DOCTYPE html><html><head>
+    <title>Example Domain</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type="text/css">
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        
+    }
+
+    img{
+        width: 80%;
+        height: 500px;
+        margin: 0 10%;
+        object-fit: cover;
+        object-position: 0 0;
+    }
+    img:hover{
+     height: auto;   
+     
+    }
+
+</style>    
+</head>
+
+<body>
+    <input type="file" name="file" id="file-selector">
+    <div id="container">
+
+    </div>
+    <script type="text/javascript">
+
+        var txt, obj, listData=[];
+// Elementos del documento
+var fFile = document.getElementById('file-selector');
+var container = document.getElementById('container');
+
+// Inicializa el listener para realizar una consulta cuando cambie la imagen seleccionada
+fFile.addEventListener('change', function(){
+  var filename = fFile.files[0];
+  var fReader = new FileReader();
+  fReader.onloadend = function(event){
+    txt = this.result;
+    txt = '{"data":['+txt+'{}]}';
+    obj = JSON.parse(txt);
+
+    listData = obj.data.slice(0,obj.data.length-1);
+    console.log(listData);
+    updateData();
+}
+
+fReader.readAsText(filename);  
+});
+
+
+function updateData(){
+    container.innerHTML = "";
+    listData.forEach(data => {
+        var d = document.createElement("div");
+        var url = document.createElement("h1");
+        url.innerText=data.page;
+        var img = document.createElement("img");
+
+        img.src= data.img;
+        d.append(url);
+        d.append(img);
+        container.append(d);
+
+    });
+
+}
+
+</script>
+<!--<script src="scrapper.js"></script>-->
+</body></html>
